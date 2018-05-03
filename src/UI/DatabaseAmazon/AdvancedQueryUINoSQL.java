@@ -5,28 +5,49 @@
  */
 package UI.DatabaseAmazon;
 
-import java.sql.Connection;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import java.util.LinkedList;
 import javax.swing.table.DefaultTableModel;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.AggregateIterable;
+import org.bson.Document;
+import com.mongodb.client.FindIterable; 
+import com.mongodb.client.MongoIterable;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
+import java.util.Iterator; 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import static com.mongodb.client.model.Projections.excludeId;
+import static com.mongodb.client.model.Projections.fields;
+import static com.mongodb.client.model.Projections.include;
+
+
 
 /**
  *
  * @author sswu
  */
-public class AdvancedQueryUI extends javax.swing.JFrame {
+public class AdvancedQueryUINoSQL extends javax.swing.JFrame {
 
     /**
      * Creates new form AdvancedQueryUI
      */
     
     private AdvancedQuery query;
+    private MongoDatabase mongodb;
     
-    public AdvancedQueryUI(Connection mysqlDB) {
+    public AdvancedQueryUINoSQL(MongoDatabase mongodb) {
+        this.mongodb = mongodb;
         initComponents();
         
         sTableHeader();
-        query = new AdvancedQuery(mysqlDB);
-        query.prepareStatements();
+     //   query = new AdvancedQuery(mongodb);
+     //   query.prepareStatements();
     }
     
     private void sTableHeader() {
@@ -63,12 +84,9 @@ public class AdvancedQueryUI extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jQ4 = new javax.swing.JTextField();
         jComboProduct = new javax.swing.JComboBox<>();
-        jSeparator1 = new javax.swing.JSeparator();
-        jSeparator2 = new javax.swing.JSeparator();
-        jSeparator3 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("MySQL");
+        setTitle("NoSQL");
 
         jComboType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Please choose one type", "Book", "DVD", "Music", "Video" }));
         jComboType.addActionListener(new java.awt.event.ActionListener() {
@@ -134,57 +152,48 @@ public class AdvancedQueryUI extends javax.swing.JFrame {
                         .addComponent(jComboCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jQ2, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 634, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jQ3Button, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 634, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jComboProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(27, 27, 27)
                         .addComponent(jQ4))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jQ3Button, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 510, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 509, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSeparator1)
-                    .addComponent(jSeparator2)
-                    .addComponent(jSeparator3)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 556, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 424, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 404, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 387, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(68, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(27, 27, 27)
+                .addGap(36, 36, 36)
                 .addComponent(jLabel1)
                 .addGap(11, 11, 11)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jQ1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jComboType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(21, 21, 21)
+                .addGap(41, 41, 41)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jComboCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jQ2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(35, 35, 35)
-                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(jQ3Button))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
-                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(26, 26, 26)
+                .addGap(31, 31, 31)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jComboProduct, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jQ4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(52, 52, 52))
+                .addContainerGap(228, Short.MAX_VALUE))
         );
 
         pack();
@@ -204,30 +213,118 @@ public class AdvancedQueryUI extends javax.swing.JFrame {
         // TODO add your handling code here:
         String value = jComboType.getSelectedItem().toString();
         
-        String name = query.getHighestSalerank(value);
-        jQ1.setText(name);
+        //String name = query.getHighestSalerank(value);
+        //get connection
+        System.out.println(this.mongodb.getName());
+        
+        MongoIterable<String> colls = this.mongodb.listCollectionNames();
+
+        for (String s : colls) {
+            System.out.println(s);
+        }
+        
+        MongoCollection<Document> collection = this.mongodb.getCollection("product");
+        
+        collection.createIndex(new BasicDBObject().append("salerank", 1));
+        
+        collection.createIndex(Indexes.text("type"));
+
+        FindIterable<Document> iterDoc = collection.find(new BasicDBObject().append("type", value)).sort(new BasicDBObject().append("salerank", -1));
+
+        // Getting the iterator 
+        Iterator it = iterDoc.iterator(); 
+    
+        if (it.hasNext()) {  
+            System.out.println(iterDoc.first().getString("title"));  
+        }
+        jQ1.setText(iterDoc.first().getString("title"));       
     }//GEN-LAST:event_jComboTypeActionPerformed
 
     private void jComboCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboCustomerActionPerformed
         // TODO add your handling code here:
         String value = jComboCustomer.getSelectedItem().toString();
         
-        double avg = query.getAvgRatingByCustomerId(value);
-        jQ2.setText(String.valueOf(avg));
+        MongoCollection<Document> review = this.mongodb.getCollection("review");
+        MongoCollection<Document> customer = this.mongodb.getCollection("customer");
+        
+        List<Document> pipeline = new ArrayList<Document>(); 
+
+        System.out.println("here"); 
+       AggregateIterable<Document> iterDoc = review.aggregate(Arrays.asList(Aggregates.match(Filters.eq("cid", value)),
+               Aggregates.group("$review", Accumulators.avg("rating", "$rating"))));//sum("count", 1)
+       Iterator it = iterDoc.iterator(); 
+    
+        if (it.hasNext()) {  
+            System.out.println(iterDoc.first().getDouble("rating"));  
+            //System.out.println(iterDoc.first().toString());
+        }
+        jQ2.setText(iterDoc.first().getDouble("rating").toString());
+
     }//GEN-LAST:event_jComboCustomerActionPerformed
 
     private void jQ3ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jQ3ButtonActionPerformed
         // TODO add your handling code here:
-        LinkedList<Category> list = query.getHighestSalerankOfCategory();
-        setCategoryTable(list);
+        //LinkedList<Category> list = query.getHighestSalerankOfCategory();           ,
+                               //     Aggregates.lookup("belongTo", "asin", "asin", "category")
+        MongoCollection<Document> product = this.mongodb.getCollection("product");
+        
+        AggregateIterable<Document> iterDoc1 = product.aggregate(Arrays.asList(Aggregates.match(Filters.eq("type", "Book")),
+               Aggregates.group("asin", Accumulators.max("salerank", "$salerank"))
+        ));
+        
+
+        String max = iterDoc1.first().get("salerank").toString();
+        System.out.println(max);
+        
+        AggregateIterable<Document> iterDoc = product.aggregate(Arrays.asList(
+                                    Aggregates.match(Filters.eq("type", "Book")),
+                                    Aggregates.lookup("belongTo", "asin", "asin", "cat_id"),
+                                    Aggregates.lookup("category", "cat_id.cat_id", "cat_id", "category"),
+                                    Aggregates.project(fields(include("title", "salerank", "type", "category.name","category.cat_id"), excludeId())),
+                                    Aggregates.match(Filters.gte("salerank", max))                   
+                   ));
+        Iterator it = iterDoc.iterator(); 
+    
+        if (it.hasNext()) {  
+            //System.out.println(iterDoc.first().get("cat_id"));  
+            System.out.println(iterDoc.first().toString());
+        }
+        //setCategoryTable(list);
         
     }//GEN-LAST:event_jQ3ButtonActionPerformed
 
     private void jComboProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboProductActionPerformed
         // TODO add your handling code here:
         String value = jComboProduct.getSelectedItem().toString();
-        String name = query.getHighestSalerankInSimilarGroup(value);
-        jQ4.setText(name);
+        MongoCollection<Document> product = this.mongodb.getCollection("product");
+        AggregateIterable<Document> iterDoc = product.aggregate(Arrays.asList(
+                                    Aggregates.match(Filters.eq("asin", value)),
+                                    Aggregates.lookup("similarTo", "asin", "asin1", "simi_pro"),
+                                    Aggregates.lookup("product", "simi_pro.asin2", "asin", "similar_product"),
+                                    Aggregates.project(fields(include("similar_product"), excludeId())),
+                                    Aggregates.project(fields(include("similar_product.asin","similar_product.title","similar_product.salerank","similar_product.type"), excludeId()))
+                   ));
+        //.get("similar_product")
+        System.out.println(iterDoc.first().toString());
+        Iterator it3 = iterDoc.iterator(); 
+        if (it3.hasNext()) {  
+            System.out.println(iterDoc.first().toString());  
+        }
+        
+        List<Document> _list = (List)(iterDoc.first().get("similar_product"));
+        Iterator<Document> it = _list.iterator(); 
+        int max = Integer.MIN_VALUE;
+        String title = "";
+        while (it.hasNext()) {  
+            Document doc = it.next();
+            int tmp = doc.getInteger("salerank");
+            if (tmp > max) {
+                max = tmp;
+                title = doc.getString("title");
+            }
+        }
+        System.out.println(title);  
+        jQ4.setText(title);
     }//GEN-LAST:event_jComboProductActionPerformed
 
     /**
@@ -247,14 +344,15 @@ public class AdvancedQueryUI extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(AdvancedQueryUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AdvancedQueryUINoSQL.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(AdvancedQueryUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AdvancedQueryUINoSQL.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(AdvancedQueryUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AdvancedQueryUINoSQL.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(AdvancedQueryUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AdvancedQueryUINoSQL.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
@@ -279,8 +377,5 @@ public class AdvancedQueryUI extends javax.swing.JFrame {
     private javax.swing.JButton jQ3Button;
     private javax.swing.JTextField jQ4;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JSeparator jSeparator3;
     // End of variables declaration//GEN-END:variables
 }
