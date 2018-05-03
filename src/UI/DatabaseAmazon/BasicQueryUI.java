@@ -187,10 +187,11 @@ public class BasicQueryUI extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jReviewButton)
-                    .addComponent(jCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jCustomerButton))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCustomer, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jReviewButton)
+                        .addComponent(jCustomerButton)))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(20, Short.MAX_VALUE))
@@ -240,6 +241,10 @@ public class BasicQueryUI extends javax.swing.JFrame {
         // TODO add your handling code here:
         String asin = jPid.getText();
         LinkedList<Review> list = bQuery.searchReviewByAsin(asin);
+        if (list.size() == 0) {
+            JOptionPane.showMessageDialog(this, "No reivew for this product");
+            return;
+        }
         setReviewTable(list);
         
     }//GEN-LAST:event_jReviewButtonActionPerformed
@@ -248,6 +253,7 @@ public class BasicQueryUI extends javax.swing.JFrame {
         // TODO add your handling code here:
         String cid = jCustomer.getText();
         LinkedList<Review> list = bQuery.searchReviewByCid(cid);
+        
         setReviewTable(list);
         
     }//GEN-LAST:event_jCustomerButtonActionPerformed
@@ -257,6 +263,10 @@ public class BasicQueryUI extends javax.swing.JFrame {
         String asin = jPid.getText();
         
         LinkedList<Product> list = bQuery.searchSimilarGroup(asin);
+        if (list.size() == 0) {
+            JOptionPane.showMessageDialog(this, "No similar product for this product");
+            return;
+        }
         setProductTable(list);
         
     }//GEN-LAST:event_jSimilarButtonActionPerformed
