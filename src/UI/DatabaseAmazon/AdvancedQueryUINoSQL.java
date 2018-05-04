@@ -15,9 +15,19 @@ import org.bson.Document;
 import com.mongodb.client.FindIterable; 
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.Accumulators;
+import static com.mongodb.client.model.Accumulators.avg;
+import static com.mongodb.client.model.Accumulators.sum;
 import com.mongodb.client.model.Aggregates;
+import static com.mongodb.client.model.Aggregates.group;
+import static com.mongodb.client.model.Aggregates.limit;
+import static com.mongodb.client.model.Aggregates.lookup;
+import static com.mongodb.client.model.Aggregates.match;
+import static com.mongodb.client.model.Aggregates.out;
+import static com.mongodb.client.model.Aggregates.sort;
 import com.mongodb.client.model.Filters;
+import static com.mongodb.client.model.Filters.eq;
 import com.mongodb.client.model.Indexes;
+import static com.mongodb.client.model.Indexes.descending;
 import java.util.Iterator; 
 import java.util.List;
 import java.util.ArrayList;
@@ -25,6 +35,8 @@ import java.util.Arrays;
 import static com.mongodb.client.model.Projections.excludeId;
 import static com.mongodb.client.model.Projections.fields;
 import static com.mongodb.client.model.Projections.include;
+import com.mongodb.client.model.Sorts;
+import static com.mongodb.client.model.Sorts.orderBy;
 
 
 
@@ -211,92 +223,109 @@ public class AdvancedQueryUINoSQL extends javax.swing.JFrame {
     
     private void jComboTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboTypeActionPerformed
         // TODO add your handling code here:
+        long startTime = System.nanoTime();
+        
         String value = jComboType.getSelectedItem().toString();
         
-        //String name = query.getHighestSalerank(value);
-        //get connection
         System.out.println(this.mongodb.getName());
         
         MongoIterable<String> colls = this.mongodb.listCollectionNames();
 
-        for (String s : colls) {
-            System.out.println(s);
-        }
         
         MongoCollection<Document> collection = this.mongodb.getCollection("product");
         
         collection.createIndex(new BasicDBObject().append("salerank", 1));
-        
-        collection.createIndex(Indexes.text("type"));
+        collection.createIndex(new BasicDBObject().append("type", 1));
 
         FindIterable<Document> iterDoc = collection.find(new BasicDBObject().append("type", value)).sort(new BasicDBObject().append("salerank", -1));
 
         // Getting the iterator 
         Iterator it = iterDoc.iterator(); 
-    
-        if (it.hasNext()) {  
-            System.out.println(iterDoc.first().getString("title"));  
-        }
-        jQ1.setText(iterDoc.first().getString("title"));       
+
+        jQ1.setText(iterDoc.first().getString("title"));
+        long endTime   = System.nanoTime();
+        long totalTime = endTime - startTime;
+        System.out.printf("NoSQL function1 running time is: %f%n", (double)totalTime);
     }//GEN-LAST:event_jComboTypeActionPerformed
 
     private void jComboCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboCustomerActionPerformed
         // TODO add your handling code here:
+        long startTime = System.nanoTime();
         String value = jComboCustomer.getSelectedItem().toString();
         
         MongoCollection<Document> review = this.mongodb.getCollection("review");
-        MongoCollection<Document> customer = this.mongodb.getCollection("customer");
+
         
         List<Document> pipeline = new ArrayList<Document>(); 
+        
+        review.createIndex(new BasicDBObject().append("cid", 1));
+        review.createIndex(new BasicDBObject().append("rating", 1));
+        review.createIndex(new BasicDBObject().append("review_date", 1));
+        review.createIndex(new BasicDBObject().append("vote", 1));
+        review.createIndex(new BasicDBObject().append("asin", 1));
+        review.createIndex(new BasicDBObject().append("id", 1));
 
-        System.out.println("here"); 
        AggregateIterable<Document> iterDoc = review.aggregate(Arrays.asList(Aggregates.match(Filters.eq("cid", value)),
                Aggregates.group("$review", Accumulators.avg("rating", "$rating"))));//sum("count", 1)
        Iterator it = iterDoc.iterator(); 
     
-        if (it.hasNext()) {  
-            System.out.println(iterDoc.first().getDouble("rating"));  
-            //System.out.println(iterDoc.first().toString());
-        }
-        jQ2.setText(iterDoc.first().getDouble("rating").toString());
 
+        jQ2.setText(iterDoc.first().getDouble("rating").toString());
+        long endTime   = System.nanoTime();
+        long totalTime = endTime - startTime;
+        System.out.printf("NoSQL function2 running time is: %f%n", (double)totalTime);
     }//GEN-LAST:event_jComboCustomerActionPerformed
 
     private void jQ3ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jQ3ButtonActionPerformed
         // TODO add your handling code here:
-        //LinkedList<Category> list = query.getHighestSalerankOfCategory();           ,
-                               //     Aggregates.lookup("belongTo", "asin", "asin", "category")
+        long startTime = System.nanoTime();
+        
         MongoCollection<Document> product = this.mongodb.getCollection("product");
-        
-        AggregateIterable<Document> iterDoc1 = product.aggregate(Arrays.asList(Aggregates.match(Filters.eq("type", "Book")),
-               Aggregates.group("asin", Accumulators.max("salerank", "$salerank"))
-        ));
-        
+        MongoCollection<Document> belongTo = this.mongodb.getCollection("belongTo");
+        MongoCollection<Document> category = this.mongodb.getCollection("category");
 
-        String max = iterDoc1.first().get("salerank").toString();
-        System.out.println(max);
-        
+        product.createIndex(new BasicDBObject().append("salerank", 1));
+        product.createIndex(new BasicDBObject().append("type", 1));
+        belongTo.createIndex(new BasicDBObject().append("asin", 1));
+        category.createIndex(new BasicDBObject().append("cat_id", 1));
         AggregateIterable<Document> iterDoc = product.aggregate(Arrays.asList(
-                                    Aggregates.match(Filters.eq("type", "Book")),
-                                    Aggregates.lookup("belongTo", "asin", "asin", "cat_id"),
-                                    Aggregates.lookup("category", "cat_id.cat_id", "cat_id", "category"),
-                                    Aggregates.project(fields(include("title", "salerank", "type", "category.name","category.cat_id"), excludeId())),
-                                    Aggregates.match(Filters.gte("salerank", max))                   
-                   ));
+                                    match(eq("type", "Book")),
+                                   sort(orderBy(descending("salerank"))),
+                                   limit(5),
+                                   lookup("belongTo", "asin", "asin", "cat_id"),
+                                   lookup("category", "cat_id.cat_id", "cat_id", "category"),
+                                   Aggregates.project(fields(include("category"), excludeId()))
+                                   
+        ));
+        LinkedList<Category> list = new LinkedList<>();  
         Iterator it = iterDoc.iterator(); 
-    
-        if (it.hasNext()) {  
-            //System.out.println(iterDoc.first().get("cat_id"));  
-            System.out.println(iterDoc.first().toString());
+        int i = 0;
+        while (it.hasNext() && i < 5) {  
+            Document doc = (Document)it.next();
+            List<Document> docList = (ArrayList<Document>)doc.get("category");
+            Document doc2 = (Document)docList.get(0);
+            list.add(new Category(doc2.getInteger("cat_id"), doc2.getString("name")));
+            i++;
         }
-        //setCategoryTable(list);
+        setCategoryTable(list);
+        
+        long endTime   = System.nanoTime();
+        long totalTime = endTime - startTime;
+        System.out.printf("NoSQL function3 running time is: %f%n", (double)totalTime);
         
     }//GEN-LAST:event_jQ3ButtonActionPerformed
 
     private void jComboProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboProductActionPerformed
         // TODO add your handling code here:
+        long startTime = System.nanoTime();
         String value = jComboProduct.getSelectedItem().toString();
         MongoCollection<Document> product = this.mongodb.getCollection("product");
+        MongoCollection<Document> similarTo = this.mongodb.getCollection("similarTo");
+        
+        product.createIndex(new BasicDBObject().append("asin", 1));
+        similarTo.createIndex(new BasicDBObject().append("asin1", 1));
+        similarTo.createIndex(new BasicDBObject().append("asin2", 1));
+        
         AggregateIterable<Document> iterDoc = product.aggregate(Arrays.asList(
                                     Aggregates.match(Filters.eq("asin", value)),
                                     Aggregates.lookup("similarTo", "asin", "asin1", "simi_pro"),
@@ -304,12 +333,6 @@ public class AdvancedQueryUINoSQL extends javax.swing.JFrame {
                                     Aggregates.project(fields(include("similar_product"), excludeId())),
                                     Aggregates.project(fields(include("similar_product.asin","similar_product.title","similar_product.salerank","similar_product.type"), excludeId()))
                    ));
-        //.get("similar_product")
-        System.out.println(iterDoc.first().toString());
-        Iterator it3 = iterDoc.iterator(); 
-        if (it3.hasNext()) {  
-            System.out.println(iterDoc.first().toString());  
-        }
         
         List<Document> _list = (List)(iterDoc.first().get("similar_product"));
         Iterator<Document> it = _list.iterator(); 
@@ -323,8 +346,10 @@ public class AdvancedQueryUINoSQL extends javax.swing.JFrame {
                 title = doc.getString("title");
             }
         }
-        System.out.println(title);  
         jQ4.setText(title);
+        long endTime   = System.nanoTime();
+        long totalTime = endTime - startTime;
+        System.out.printf("NoSQL function4 running time is: %f%n", (double)totalTime);
     }//GEN-LAST:event_jComboProductActionPerformed
 
     /**

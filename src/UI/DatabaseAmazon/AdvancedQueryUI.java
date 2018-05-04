@@ -202,32 +202,48 @@ public class AdvancedQueryUI extends javax.swing.JFrame {
     
     private void jComboTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboTypeActionPerformed
         // TODO add your handling code here:
+        long startTime = System.nanoTime();
         String value = jComboType.getSelectedItem().toString();
         
         String name = query.getHighestSalerank(value);
         jQ1.setText(name);
+        long endTime   = System.nanoTime();
+        long totalTime = endTime - startTime;
+        System.out.printf("MySQL function1 running time is: %f%n", (double)totalTime);
     }//GEN-LAST:event_jComboTypeActionPerformed
 
     private void jComboCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboCustomerActionPerformed
         // TODO add your handling code here:
+        long startTime = System.nanoTime();
         String value = jComboCustomer.getSelectedItem().toString();
         
         double avg = query.getAvgRatingByCustomerId(value);
         jQ2.setText(String.valueOf(avg));
+        long endTime   = System.nanoTime();
+        long totalTime = endTime - startTime;
+        System.out.printf("MySQL function2 running time is: %f%n", (double)totalTime);
     }//GEN-LAST:event_jComboCustomerActionPerformed
 
     private void jQ3ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jQ3ButtonActionPerformed
         // TODO add your handling code here:
+        long startTime = System.nanoTime();
         LinkedList<Category> list = query.getHighestSalerankOfCategory();
         setCategoryTable(list);
+        long endTime   = System.nanoTime();
+        long totalTime = endTime - startTime;
+        System.out.printf("MySQL function3 running time is: %f%n", (double)totalTime);
         
     }//GEN-LAST:event_jQ3ButtonActionPerformed
 
     private void jComboProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboProductActionPerformed
         // TODO add your handling code here:
+        long startTime = System.nanoTime();
         String value = jComboProduct.getSelectedItem().toString();
         String name = query.getHighestSalerankInSimilarGroup(value);
         jQ4.setText(name);
+        long endTime   = System.nanoTime();
+        long totalTime = endTime - startTime;
+        System.out.printf("MySQL function4 running time is: %f%n", (double)totalTime);
     }//GEN-LAST:event_jComboProductActionPerformed
 
     /**
