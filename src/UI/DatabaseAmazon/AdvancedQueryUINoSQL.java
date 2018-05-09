@@ -42,7 +42,7 @@ import static com.mongodb.client.model.Sorts.orderBy;
 
 /**
  *
- * @author sswu
+ * @author Lei Luo
  */
 public class AdvancedQueryUINoSQL extends javax.swing.JFrame {
 
@@ -142,7 +142,7 @@ public class AdvancedQueryUINoSQL extends javax.swing.JFrame {
 
         jLabel4.setText("In similar group, which product has the highest salerank? Show product name");
 
-        jComboProduct.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Please choose a product", "1577943082", "B00000AU3R", "6472184", "2154129", "2250535" }));
+        jComboProduct.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Please choose a product", "1577943082", "1577943279", "1577943422", "1577944437", "1578004306" }));
         jComboProduct.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboProductActionPerformed(evt);
@@ -165,17 +165,17 @@ public class AdvancedQueryUINoSQL extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(jQ2, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jQ3Button, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 634, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jComboProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(27, 27, 27)
                         .addComponent(jQ4))
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 424, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 404, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 387, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 498, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 458, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(68, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
