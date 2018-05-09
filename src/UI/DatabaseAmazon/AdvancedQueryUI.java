@@ -112,7 +112,7 @@ public class AdvancedQueryUI extends javax.swing.JFrame {
 
         jLabel4.setText("In similar group, which product has the highest salerank? Show product name");
 
-        jComboProduct.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Please choose a product", "1577943082", "B00000AU3R", "6472184", "2154129", "2250535" }));
+        jComboProduct.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Please choose a product", "1577943082", "1577943279", "1577943422", "1577944437", "1578004306" }));
         jComboProduct.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboProductActionPerformed(evt);

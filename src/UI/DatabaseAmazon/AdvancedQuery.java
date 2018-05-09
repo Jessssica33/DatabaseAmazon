@@ -31,10 +31,19 @@ public class AdvancedQuery {
             "and salerank >= All(select p.salerank from product p where p.type = 'Book'))";
     private PreparedStatement _cat_of_highest_salerank_statement;
     
-    private String _highest_salerank_similar = "Select max(Z.salerank) as m, Z.name from (select distinct p.asin, p.salerank as salerank, p.title as name "
-            + "from product p, (select asin2 from similarTo where asin1 = ?) X," 
-            + "(select asin1 from similarTo where asin2 = ?) Y where p.asin = X.asin2 or p.asin = Y.asin1 or p.asin = ?) Z";
+        private String _highest_salerank_similar = "select p2.title, p2.salerank " +
+"from product p1 " +
+"join similarTo s1 on p1.asin=s1.asin1 " +
+"join product p2 on s1.asin2=p2.asin " +
+"where p1.asin=? " +
+"order by p2.salerank desc " +
+"limit 1";
+//    
+//    private String _highest_salerank_similar = "Select max(Z.salerank) as m, Z.name from (select distinct p.asin, p.salerank as salerank, p.title as name "
+//            + "from product p, (select asin2 from similarTo where asin1 = ?) X," 
+//            + "(select asin1 from similarTo where asin2 = ?) Y where p.asin = X.asin2 or p.asin = Y.asin1 or p.asin = ?) Z";
     private PreparedStatement _highest_salerank_similar_statement;
+    
     
     public AdvancedQuery(Connection mysqlDB) {
         _mysqlDB = mysqlDB;
@@ -59,12 +68,12 @@ public class AdvancedQuery {
         try {
             _highest_salerank_similar_statement.clearParameters();
             _highest_salerank_similar_statement.setString(1, asin);
-            _highest_salerank_similar_statement.setString(2, asin);
-            _highest_salerank_similar_statement.setString(3, asin);
+      //      _highest_salerank_similar_statement.setString(2, asin);
+       //     _highest_salerank_similar_statement.setString(3, asin);
             
             ResultSet product_set = _highest_salerank_similar_statement.executeQuery();
             while (product_set.next()) {
-                name = product_set.getString(2);
+                name = product_set.getString(1);
             }
             product_set.close();
             
